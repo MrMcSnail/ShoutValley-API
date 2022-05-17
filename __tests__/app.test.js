@@ -33,3 +33,30 @@ describe('GET /api/topics', () => {
     });
   });
 });
+
+describe('GET /api/articles/:article_id', () => {
+  test('Status 200: Responds with an article from the DB based on the id parameter in the request', () => {
+    return request(app).get('/api/articles/8').expect(200).then(({body})=>{
+      const article = {
+        article_id: 8,
+        title: expect.any(String),
+        topic: expect.any(String),
+        author: expect.any(String),
+        body: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+      };
+      expect(body.article).toEqual(expect.objectContaining(article));
+    });
+  });
+  test('Status 400: responds with "Invalid Input" if article_id is not in the correct format', () => {
+    return request(app).get('/api/articles/handbag').expect(400).then(({body})=>{
+      expect(body.msg).toBe('Invalid input');
+    });
+  });
+  test('Status 404: responds with invalid article ID if ID is out of range of the DB', () => {
+    return request(app).get('/api/articles/9999').expect(404).then(({body})=>{
+      expect(body.msg).toEqual('9999 is an invalid Article ID.');
+    });
+  });
+});

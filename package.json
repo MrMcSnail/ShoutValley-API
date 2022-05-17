@@ -35,5 +35,10 @@
     "setupFilesAfterEnv": [
       "jest-extended/all"
     ]
+  },
+  "eslintConfig": {
+    "rules": {
+      "prefer-promise-reject-errors": 0 
+    }
   }
 }
