@@ -106,7 +106,7 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 });
 
-describe.only('GET /api/users', ()=>{
+describe('GET /api/users', ()=>{
   test(`Status 200: Responds with an array of objects, each object should have the following property:
 username`, () => {
     return request(app).get('/api/users').expect(200).then(({body})=>{
@@ -114,6 +114,11 @@ username`, () => {
       body.users.forEach((user)=>{
         expect(user).toHaveProperty('username');
       });
+    });
+  });
+  test(`Status 404: Mis-spelled url`, () => {
+    return request(app).get('/api/handbag').expect(404).then(({body})=>{
+      expect(body).toHaveProperty('message', 'Not Found');
     });
   });
 });
