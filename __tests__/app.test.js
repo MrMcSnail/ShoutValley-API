@@ -39,23 +39,23 @@ describe('GET /api/articles/:article_id', () => {
     return request(app).get('/api/articles/8').expect(200).then(({body})=>{
       const article = {
         article_id: 8,
-        title: 'Does Mitch predate civilisation?',
-        topic: 'mitch',
-        author: 'icellusedkars',
-        body: 'Archaeologists have uncovered a gigantic statue from the dawn of humanity, and it has an uncanny resemblance to Mitch. Surely I am not the only person who can see this?!',
+        title: expect.any(String),
+        topic: expect.any(String),
+        author: expect.any(String),
+        body: expect.any(String),
         created_at: expect.any(String),
-        votes: 0,
+        votes: expect.any(Number),
       };
-      expect(body.article).toEqual(article);
+      expect(body.article).toEqual(expect.objectContaining(article));
     });
   });
   test('Status 400: responds with "Invalid Input" if article_id is not in the correct format', () => {
     return request(app).get('/api/articles/handbag').expect(400).then(({body})=>{
-      expect(body.msg).toEqual('Invalid input');
+      expect(body.msg).toBe('Invalid input');
     });
   });
-  test('Status 400: responds with invalid article ID if ID is out of range of the DB', () => {
-    return request(app).get('/api/articles/9999').expect(400).then(({body})=>{
+  test('Status 404: responds with invalid article ID if ID is out of range of the DB', () => {
+    return request(app).get('/api/articles/9999').expect(404).then(({body})=>{
       expect(body.msg).toEqual('9999 is an invalid Article ID.');
     });
   });
