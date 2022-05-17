@@ -60,3 +60,14 @@ describe('GET /api/articles/:article_id', () => {
     });
   });
 });
+
+describe('GET /api/users', () => {
+  test('Status 200: Responds with an array of objects, each object should have the following property:`username`', () => {
+    return request(app).get('/api/users').expect(200).then(({body})=> {
+      expect(body).toBeInstanceOf(Array);
+      body.forEach((object) => {
+        expect(object).toHaveProperty('username');
+      });
+    });
+  });
+});
