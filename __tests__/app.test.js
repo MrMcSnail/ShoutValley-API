@@ -51,7 +51,7 @@ describe('GET /api/articles/:article_id', () => {
   });
   test('Status 400: responds with "Invalid Input" if article_id is not in the correct format', () => {
     return request(app).get('/api/articles/handbag').expect(400).then(({body})=>{
-      expect(body.msg).toBe('Invalid input');
+      expect(body.msg).toBe('Invalid Input');
     });
   });
   test('Status 404: responds with invalid article ID if ID is out of range of the DB', () => {
@@ -61,12 +61,58 @@ describe('GET /api/articles/:article_id', () => {
   });
 });
 
-describe('GET /api/users', () => {
-  test('Status 200: Responds with an array of objects, each object should have the following property:`username`', () => {
-    return request(app).get('/api/users').expect(200).then(({body})=> {
-      expect(body).toBeInstanceOf(Array);
-      body.forEach((object) => {
-        expect(object).toHaveProperty('username');
+describe('PATCH /api/articles/:article_id', () => {
+  test('Status 200: Request body accepts an object in the form `{ inc_votes: newVote }`, updates the DB and then responds with the updated article', () => {
+    const article = {
+      article_id: 1,
+      title: expect.any(String),
+      topic: expect.any(String),
+      author: expect.any(String),
+      body: expect.any(String),
+      created_at: expect.any(String),
+      votes: 223,
+    };
+    const requestBody = {inc_votes: 123};
+
+    return request(app).patch('/api/articles/1').send(requestBody).expect(200).then(({body})=> {
+      expect(body).toEqual(expect.objectContaining({article}));
+    });
+  });
+  test('Should work for both positive and negative numbers of votes', ()=> {
+    const requestBody = {inc_votes: - 50};
+    return request(app).patch('/api/articles/1').send(requestBody).expect(200).then(({body})=>{
+      const votes = body.article.votes;
+      expect(votes).toBe(50);
+    });
+  });
+  test('Should work when the decriment makes the value of `votes` negative', ()=> {
+    const requestBody = {inc_votes: - 150};
+    return request(app).patch('/api/articles/1').send(requestBody).expect(200).then(({body})=>{
+      const votes = body.article.votes;
+      expect(votes).toBe(-50);
+    });
+  });
+  test('Status 400: responds with "Bad Request" when there is no `inc_votes` on the request body', ()=> {
+    const requestBody = {handbag: 101};
+    return request(app).patch('/api/articles/2').send(requestBody).expect(400).then(({body})=>{
+      expect(body.msg).toBe('Bad Request');
+    });
+  });
+  test('Status 400: responds with "Invalid Input" when ``inc_votes`` is an invalid format)', ()=> {
+    const requestBody = {inc_votes: 'handbag'};
+    return request(app).patch('/api/articles/3').send(requestBody).expect(400).then(({body})=>{
+      expect(body.msg).toBe('Invalid Input');
+    });
+  });
+});
+
+describe.only('GET /api/users', ()=>{
+  test(`Status 200: Responds with an array of objects, each object should have the following property:
+username`, () => {
+    return request(app).get('/api/users').expect(200).then(({body})=>{
+      expect(body.users).toBeInstanceOf(Array);
+      body.users.forEach((user)=>{
+        expect(user).toHaveProperty('username');
       });
     });
   });
