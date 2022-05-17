@@ -51,12 +51,59 @@ describe('GET /api/articles/:article_id', () => {
   });
   test('Status 400: responds with "Invalid Input" if article_id is not in the correct format', () => {
     return request(app).get('/api/articles/handbag').expect(400).then(({body})=>{
-      expect(body.msg).toBe('Invalid input');
+      expect(body.msg).toBe('Invalid Input');
     });
   });
   test('Status 404: responds with invalid article ID if ID is out of range of the DB', () => {
     return request(app).get('/api/articles/9999').expect(404).then(({body})=>{
       expect(body.msg).toEqual('9999 is an invalid Article ID.');
+    });
+  });
+});
+
+describe('PATCH /api/articles/:article_id', () => {
+  test('Status 201: Request body accepts an object in the form `{ inc_votes: newVote }`, updates the DB and then responds with the updated article', () => {
+    const updatedArticle = {
+      article_id: 1,
+      title: expect.any(String),
+      topic: expect.any(String),
+      author: expect.any(String),
+      body: expect.any(String),
+      created_at: expect.any(String),
+      votes: 223,
+    };
+    const requestBody = {inc_votes: 123};
+
+    return request(app).patch('/api/articles/1').send(requestBody).expect(201).then(({body})=> {
+      expect(body).toEqual(expect.objectContaining({updatedArticle}));
+    });
+  });
+  test('Should work for both positive and negative numbers of votes', ()=> {
+    const requestBody = {inc_votes: - 50};
+    return request(app).patch('/api/articles/1').send(requestBody).expect(201).then(({body})=>{
+      const votes = body.updatedArticle.votes;
+      expect(votes).toBe(50);
+    });
+  });
+  test('Should work when the decriment makes the value of `votes` negative', ()=> {
+    const requestBody = {inc_votes: - 150};
+    return request(app).patch('/api/articles/1').send(requestBody).expect(201).then(({body})=>{
+      const votes = body.updatedArticle.votes;
+      expect(votes).toBe(-50);
+    });
+  });
+  test('Status 400: responds with "Bad Request" when there is no `inc_votes` on the request body', ()=> {
+    const requestBody = {handbag: 101};
+    return request(app).patch('/api/articles/2').send(requestBody).expect(400).then(({body})=>{
+      console.log('body: ', body);
+      expect(body.msg).toBe('Bad Request');
+    });
+  });
+  test('Status 400: responds with "Invalid Input" when ``inc_votes`` is an invalid format)', ()=> {
+    const requestBody = {inc_votes: 'handbag'};
+    return request(app).patch('/api/articles/3').send(requestBody).expect(400).then(({body})=>{
+      console.log('body: ', body);
+      expect(body.msg).toBe('Invalid Input');
     });
   });
 });
