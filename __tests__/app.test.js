@@ -51,9 +51,12 @@ describe('GET /api/articles/:article_id', () => {
   });
   test('Status 400: responds with "Invalid Input" if article_id is not in the correct format', () => {
     return request(app).get('/api/articles/handbag').expect(400).then(({body})=>{
-      console.log(body.msg);
       expect(body.msg).toEqual('Invalid input');
     });
   });
-  test.todo('Status 400: responds with invalid article ID if ID is out of range of the DB');
+  test('Status 400: responds with invalid article ID if ID is out of range of the DB', () => {
+    return request(app).get('/api/articles/9999').expect(400).then(({body})=>{
+      expect(body.msg).toEqual('9999 is an invalid Article ID.');
+    });
+  });
 });
