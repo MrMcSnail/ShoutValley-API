@@ -1,4 +1,5 @@
 const request = require('supertest');
+require('jest-sorted');
 const seed = require('../db/seeds/seed');
 const testData = require('../db/data/test-data');
 const db = require('../db/connection');
@@ -31,6 +32,34 @@ describe('GET /api/topics', () => {
         });
       }
     });
+  });
+});
+
+describe.only('GET /api/articles', ()=> {
+  test('Status 200: should respond with an `articles` array of article objects, each article object should have the correct properties the articles should be sorted by date in descending order.', () => {
+    return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+          const articles = body.articles;
+          console.log('articles: ', articles);
+          const exampleArticle = {
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_count: expect.any(String),
+          };
+          if (articles.length) {
+            articles.forEach((article)=>{
+              expect(article).toMatchObject(exampleArticle);
+            });
+          }
+          expect(articles).toBeSortedBy('created_at', { descending: true });
+        });
   });
 });
 
