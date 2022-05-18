@@ -1,6 +1,6 @@
-exports.convertTimestampToDate = ({ created_at, ...otherProperties }) => {
-  if (!created_at) return { ...otherProperties };
-  return { created_at: new Date(created_at), ...otherProperties };
+exports.convertTimestampToDate = ({created_at, ...otherProperties}) => {
+  if (!created_at) return {...otherProperties};
+  return {created_at: new Date(created_at), ...otherProperties};
 };
 
 exports.createRef = (arr, key, value) => {
@@ -11,7 +11,7 @@ exports.createRef = (arr, key, value) => {
 };
 
 exports.formatComments = (comments, idLookup) => {
-  return comments.map(({ created_by, belongs_to, ...restOfComment }) => {
+  return comments.map(({created_by, belongs_to, ...restOfComment}) => {
     const article_id = idLookup[belongs_to];
     return {
       article_id,

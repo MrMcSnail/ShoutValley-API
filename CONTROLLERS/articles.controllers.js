@@ -1,10 +1,18 @@
 /* eslint-disable prefer-promise-reject-errors */
 const {fetchArticleById, updateVotesByArticleID} = require('../MODELS/articles.models');
+const {fetchCommentCountByArticleID} = require('../MODELS/comments.models');
 
 exports.getArticleByID = (req, res, next) => {
   const {article_id} = req.params;
-  return fetchArticleById(article_id)
-      .then((article)=>{
+
+  const promises = [
+    fetchArticleById(article_id),
+    fetchCommentCountByArticleID(article_id),
+  ];
+
+  return Promise.all(promises)
+      .then(([article, comments])=>{
+        article.comment_count = parseInt(comments.count);
         return res.status(200).send({article});
       })
       .catch(next);
@@ -20,4 +28,3 @@ exports.patchVotesByArticleID = (req, res, next) => {
       })
       .catch((next));
 };
-

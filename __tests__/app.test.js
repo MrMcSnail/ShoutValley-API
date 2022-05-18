@@ -49,6 +49,11 @@ describe('GET /api/articles/:article_id', () => {
       expect(body.article).toEqual(expect.objectContaining(article));
     });
   });
+  test(`Status 200: An article response object should also now include: 'comment_count' which is the total count of all the comments with this article_id`, ()=>{
+    return request(app).get('/api/articles/3').expect(200).then(({body})=>{
+      expect(body.article).toHaveProperty('comment_count', 2);
+    });
+  });
   test('Status 400: responds with "Invalid Input" if article_id is not in the correct format', () => {
     return request(app).get('/api/articles/handbag').expect(400).then(({body})=>{
       expect(body.msg).toBe('Invalid Input');
