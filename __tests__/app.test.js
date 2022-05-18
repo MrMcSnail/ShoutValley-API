@@ -111,14 +111,12 @@ describe('GET /api/users', ()=>{
 username`, () => {
     return request(app).get('/api/users').expect(200).then(({body})=>{
       expect(body.users).toBeInstanceOf(Array);
-      body.users.forEach((user)=>{
-        expect(user).toHaveProperty('username');
-      });
-    });
-  });
-  test(`Status 404: Mis-spelled url`, () => {
-    return request(app).get('/api/handbag').expect(404).then(({body})=>{
-      expect(body).toHaveProperty('message', 'Not Found');
+      if (body.users.length !== 0) {
+        body.users.forEach((user)=>{
+          expect(user).toHaveProperty('username');
+        });
+      }
     });
   });
 });
+
