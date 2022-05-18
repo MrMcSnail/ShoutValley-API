@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const {getTopics} = require('./CONTROLLERS/topics.controllers');
 const {getArticleByID, patchVotesByArticleID} = require('./CONTROLLERS/articles.controllers');
+const {getAllUsers} = require('./CONTROLLERS/users.controllers');
 const {handleCustomErrors, handlePsqlErrors, handleServerErrors,
 } = require('./CONTROLLERS/errors.controllers');
 app.use(express.json());
@@ -11,6 +12,7 @@ app.get('/api/topics', getTopics);
 app.get('/api/articles/:article_id', getArticleByID);
 app.patch('/api/articles/:article_id', patchVotesByArticleID);
 
+app.get('/api/users', getAllUsers);
 
 app.all('/*', (req, res) => {
   res.status(404).send({message: 'Not Found'});

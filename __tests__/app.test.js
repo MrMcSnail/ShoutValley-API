@@ -62,7 +62,7 @@ describe('GET /api/articles/:article_id', () => {
 });
 
 describe('PATCH /api/articles/:article_id', () => {
-  test('Status 201: Request body accepts an object in the form `{ inc_votes: newVote }`, updates the DB and then responds with the updated article', () => {
+  test('Status 200: Request body accepts an object in the form `{ inc_votes: newVote }`, updates the DB and then responds with the updated article', () => {
     const article = {
       article_id: 1,
       title: expect.any(String),
@@ -105,3 +105,18 @@ describe('PATCH /api/articles/:article_id', () => {
     });
   });
 });
+
+describe('GET /api/users', ()=>{
+  test(`Status 200: Responds with an array of objects, each object should have the following property:
+username`, () => {
+    return request(app).get('/api/users').expect(200).then(({body})=>{
+      expect(body.users).toBeInstanceOf(Array);
+      if (body.users.length !== 0) {
+        body.users.forEach((user)=>{
+          expect(user).toHaveProperty('username');
+        });
+      }
+    });
+  });
+});
+
