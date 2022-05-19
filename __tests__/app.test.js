@@ -201,9 +201,13 @@ describe.only('POST /api/articles/:article_id/comments', () => {
     });
   });
   test('Status 404: should respond with ""article_id" is an invalid Article ID." when an incorrect article id is passed', ()=>{
-    return request(app).post('/api/articles/10101/comments').send({username: 'rogersop', body: `this article doesn't even exist`}).expect(404).then(({body})=>{
-      expect(body.msg).toBe(`10101 is an invalid Article ID.`);
-    });
+    return request(app)
+        .post('/api/articles/10101/comments')
+        .send({username: 'rogersop', body: `this article doesn't even exist`})
+        .expect(404)
+        .then(({body})=>{
+          expect(body.msg).toBe(`10101 is an invalid Article ID.`);
+        });
   });
   test('Status 400: should respond with "Invalid Input" when given an invalid format within the request body', ()=>{
     return request(app)
@@ -214,5 +218,13 @@ describe.only('POST /api/articles/:article_id/comments', () => {
           expect(body.msg).toBe(`Invalid Input`);
         });
   });
-  test.todo('Status 400: responds with "Bad Request" when the request is not in the correct format');
+  test('Status 400: responds with "Username Does Not Exist" when the request includes a username not in the database', ()=>{
+    return request(app)
+        .post('/api/articles/1/comments')
+        .send({username: 'handbag', body: `you're dead to me`})
+        .expect(400)
+        .then(({body})=>{
+          expect(body.msg).toBe(`Username Does Not Exist`);
+        });
+  });
 });
