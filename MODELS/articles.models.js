@@ -23,15 +23,16 @@ exports.fetchAllArticles = () => {
 exports.fetchArticleById = (article_id) => {
   return db
       .query(`
-  SELECT * FROM articles 
-  WHERE article_id=$1`, [article_id])
+  SELECT 
+  articles.*,
+  COUNT(comments.article_id) as "comment_count"
+  FROM articles
+  LEFT JOIN comments 
+  ON comments.article_id = articles.article_id
+  WHERE articles.article_id = $1
+  GROUP BY articles.article_id
+  ORDER BY created_at DESC;`, [article_id])
       .then(({rows})=>{
-        if (!rows.length) {
-          return Promise.reject({
-            status: 404,
-            msg: `${article_id} is an invalid Article ID.`,
-          });
-        }
         return rows[0];
       });
 };
