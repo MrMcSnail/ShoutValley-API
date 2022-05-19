@@ -154,7 +154,7 @@ username`, () => {
 });
 
 describe('GET /api/articles/:article_id/comments', () => {
-  test(`Status 200: Responds with an array of comments for the given "article_id" of which each comment should have the following properties: comment_id, votes, created_at, author, body`, () => {
+  test(`Status 200: Responds with an array of comments for the given "article_id" of which each comment should have the correct properties`, () => {
     const comment = {
       comment_id: expect.any(Number),
       body: expect.any(String),
@@ -166,6 +166,16 @@ describe('GET /api/articles/:article_id/comments', () => {
     return request(app).get('/api/articles/3/comments').expect(200).then(({body})=>{
       expect(body.comments).toBeInstanceOf(Array);
       expect(body.comments[0]).toEqual(expect.objectContaining(comment));
+    });
+  });
+  test('Status 404: should respont with "Not Found" when an incorrect article id is passed', () => {
+    return request(app).get('/api/articles/9999/comments').expect(404).then(({body}) => {
+      expect(body.msg).toBe('9999 is an invalid Article ID.');
+    });
+  });
+  test('Status 400: should respond with "Invalid Input" when given an article_id in an invalid format', ()=>{
+    return request(app).get('/api/articles/nasty/comments').expect(400).then(({body})=>{
+      expect(body.msg).toBe('Invalid Input');
     });
   });
 });

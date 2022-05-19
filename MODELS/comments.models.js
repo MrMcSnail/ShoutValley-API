@@ -3,9 +3,16 @@ const db = require('../db/connection');
 exports.fetchCommentsByArticleID = (article_id) => {
   return db.query(`SELECT * 
       FROM comments 
-      WHERE article_id = $1`, [article_id]).then(({rows})=>{
-    return rows;
-  });
+      WHERE article_id = $1`, [article_id])
+      .then(({rows})=>{
+        if (!rows.length) {
+          return Promise.reject({
+            status: 404,
+            msg: `${article_id} is an invalid Article ID.`,
+          });
+        }
+        return rows;
+      });
 };
 
 exports.fetchCommentCountByArticleID = (article_id) => {
