@@ -5,7 +5,6 @@ const {fetchCommentCountByArticleID} = require('../MODELS/comments.models');
 exports.getAllArticles = (req, res, next) => {
   return fetchAllArticles()
       .then((articles)=>{
-        console.log('articles: ', articles);
         return res.status(200).send({articles});
       });
 };
