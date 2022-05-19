@@ -35,14 +35,13 @@ describe('GET /api/topics', () => {
   });
 });
 
-describe.only('GET /api/articles', ()=> {
+describe('GET /api/articles', ()=> {
   test('Status 200: should respond with an `articles` array of article objects, each article object should have the correct properties the articles should be sorted by date in descending order.', () => {
     return request(app)
         .get('/api/articles')
         .expect(200)
         .then(({body}) => {
           const articles = body.articles;
-          console.log('articles: ', articles);
           const exampleArticle = {
             article_id: expect.any(Number),
             title: expect.any(String),
@@ -58,7 +57,7 @@ describe.only('GET /api/articles', ()=> {
               expect(article).toMatchObject(exampleArticle);
             });
           }
-          expect(articles).toBeSortedBy('created_at', { descending: true });
+          expect(articles).toBeSortedBy('created_at', {descending: true});
         });
   });
 });
@@ -80,7 +79,7 @@ describe('GET /api/articles/:article_id', () => {
   });
   test(`Status 200: An article response object should also now include: 'comment_count' which is the total count of all the comments with this article_id`, ()=>{
     return request(app).get('/api/articles/3').expect(200).then(({body})=>{
-      expect(body.article).toHaveProperty('comment_count', 2);
+      expect(body.article).toHaveProperty('comment_count', '2');
     });
   });
   test('Status 400: responds with "Invalid Input" if article_id is not in the correct format', () => {
@@ -154,3 +153,19 @@ username`, () => {
   });
 });
 
+describe('GET /api/articles/:article_id/comments', () => {
+  test(`Status 200: Responds with an array of comments for the given "article_id" of which each comment should have the following properties: comment_id, votes, created_at, author, body`, () => {
+    const comment = {
+      comment_id: expect.any(Number),
+      body: expect.any(String),
+      article_id: 3,
+      author: expect.any(String),
+      votes: expect.any(Number),
+      created_at: expect.any(String),
+    };
+    return request(app).get('/api/articles/3/comments').expect(200).then(({body})=>{
+      expect(body.comments).toBeInstanceOf(Array);
+      expect(body.comments[0]).toEqual(expect.objectContaining(comment));
+    });
+  });
+});
