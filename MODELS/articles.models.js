@@ -29,7 +29,7 @@ exports.fetchArticleById = (article_id) => {
         if (!rows.length) {
           return Promise.reject({
             status: 404,
-            msg: `${article_id} is an invalid Article ID.`,
+            msg: `Article with ID:${article_id} is not found.`,
           });
         }
         return rows[0];

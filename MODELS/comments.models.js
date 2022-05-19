@@ -12,7 +12,7 @@ exports.fetchCommentsByArticleID = (article_id) => {
         } else {
           return Promise.reject({
             status: 404,
-            msg: `${article_id} is an invalid Article ID.`,
+            msg: `Article with ID:${article_id} is not found.`,
           });
         }
       }).then(({rows})=>{
@@ -46,7 +46,7 @@ exports.insertCommentAboutArticle = (article_id, username, body) => {
         } else {
           return Promise.reject({
             status: 404,
-            msg: `${article_id} is an invalid Article ID.`,
+            msg: `Article with ID:${article_id} is not found.`,
           });
         }
       });

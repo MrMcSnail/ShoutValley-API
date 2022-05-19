@@ -89,7 +89,7 @@ describe('GET /api/articles/:article_id', () => {
   });
   test('Status 404: responds with invalid article ID if ID is out of range of the DB', () => {
     return request(app).get('/api/articles/9999').expect(404).then(({body})=>{
-      expect(body.msg).toEqual('9999 is an invalid Article ID.');
+      expect(body.msg).toEqual('Article with ID:9999 is not found.');
     });
   });
 });
@@ -176,7 +176,7 @@ describe('GET /api/articles/:article_id/comments', () => {
   });
   test('Status 404: should respond with "Not Found" when an incorrect article id is passed', () => {
     return request(app).get('/api/articles/9999/comments').expect(404).then(({body}) => {
-      expect(body.msg).toBe('9999 is an invalid Article ID.');
+      expect(body.msg).toBe('Article with ID:9999 is not found.');
     });
   });
   test('Status 400: should respond with "Invalid Input" when given an article_id in an invalid format', ()=>{
@@ -186,7 +186,7 @@ describe('GET /api/articles/:article_id/comments', () => {
   });
 });
 
-describe.only('POST /api/articles/:article_id/comments', () => {
+describe('POST /api/articles/:article_id/comments', () => {
   test('Status 201: Request body accepts an object with the following properties: username, body and responds with: the posted comment', ()=>{
     return request(app).post('/api/articles/3/comments').send({username: 'rogersop', body: 'your article looks really nice'}).expect(201).then(({body})=>{
       const commentObj = {
@@ -200,15 +200,24 @@ describe.only('POST /api/articles/:article_id/comments', () => {
       expect(body.comment).toEqual(expect.objectContaining(commentObj));
     });
   });
-  test('Status 404: should respond with ""article_id" is an invalid Article ID." when an incorrect article id is passed', ()=>{
+  test('Status 404: should respond with "Article with ID:xxxx is not found." when an incorrect article id is passed', ()=>{
     return request(app)
         .post('/api/articles/10101/comments')
         .send({username: 'rogersop', body: `this article doesn't even exist`})
         .expect(404)
         .then(({body})=>{
-          expect(body.msg).toBe(`10101 is an invalid Article ID.`);
+          expect(body.msg).toBe(`Article with ID:10101 is not found.`);
         });
   });
+  test('Status 400: should respond with Invalid Input when article_id is of the wrong type', ()=>{
+    return request(app)
+        .post('/api/articles/handbag/comments')
+        .send({username: 'rogersop', body: `this article doesn't even exist`})
+        .expect(400)
+        .then(({body})=>{
+          expect(body.msg).toBe(`Invalid Input`);
+        });
+  })
   test('Status 400: should respond with "Invalid Input" when given an invalid format within the request body', ()=>{
     return request(app)
         .post('/api/articles/1/comments')
@@ -218,11 +227,11 @@ describe.only('POST /api/articles/:article_id/comments', () => {
           expect(body.msg).toBe(`Invalid Input`);
         });
   });
-  test('Status 400: responds with "Username Does Not Exist" when the request includes a username not in the database', ()=>{
+  test('Status 404: responds with "Username Does Not Exist" when the request includes a username not in the database', ()=>{
     return request(app)
         .post('/api/articles/1/comments')
         .send({username: 'handbag', body: `you're dead to me`})
-        .expect(400)
+        .expect(404)
         .then(({body})=>{
           expect(body.msg).toBe(`Username Does Not Exist`);
         });

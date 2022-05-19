@@ -5,7 +5,6 @@ exports.handleCustomErrors = (err, req, res, next) => {
 };
 
 exports.handlePsqlErrors = (err, req, res, next) => {
-  console.log('err.detail: ', err.detail);
   if (err.code === '22P02') {
     res.status(400).send({msg: 'Invalid Input'});
   }
@@ -13,8 +12,7 @@ exports.handlePsqlErrors = (err, req, res, next) => {
     res.status(400).send({msg: 'Invalid Input'});
   }
   if (err.detail.includes('is not present in table "users"')) {
-    console.log('err: ', err);
-    res.status(400).send({msg: 'Username Does Not Exist'});
+    res.status(404).send({msg: 'Username Does Not Exist'});
   } else next(err);
 };
 
