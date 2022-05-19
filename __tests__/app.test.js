@@ -168,7 +168,13 @@ describe('GET /api/articles/:article_id/comments', () => {
       expect(body.comments[0]).toEqual(expect.objectContaining(comment));
     });
   });
-  test('Status 404: should respont with "Not Found" when an incorrect article id is passed', () => {
+  test('Should return an empty array if there are no comments', ()=>{
+    return request(app).get('/api/articles/2/comments').expect(200).then(({body})=>{
+      expect(body.comments).toBeInstanceOf(Array);
+      expect(body.comments.length).toBe(0);
+    });
+  });
+  test('Status 404: should respond with "Not Found" when an incorrect article id is passed', () => {
     return request(app).get('/api/articles/9999/comments').expect(404).then(({body}) => {
       expect(body.msg).toBe('9999 is an invalid Article ID.');
     });

@@ -20,7 +20,7 @@ exports.getArticleByID = (req, res, next) => {
 
   return Promise.all(promises)
       .then(([article, comments])=>{
-        article.comment_count = parseInt(comments.count);
+        article.comment_count = comments.count;
         return res.status(200).send({article});
       })
       .catch(next);
