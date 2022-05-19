@@ -200,8 +200,12 @@ describe.only('POST /api/articles/:article_id/comments', () => {
       expect(body.comment).toEqual(expect.objectContaining(commentObj));
     });
   });
-  test.todo('Status 404: should respond with ""article_id" is an invalid Article ID." when an incorrect article id is passed');
-  test.todo('Status 400: should respond with "Invalid Input" when given an invalid format within the request body');
+  test('Status 404: should respond with ""article_id" is an invalid Article ID." when an incorrect article id is passed', ()=>{
+    return request(app).post('/api/articles/10101/comments').send({username: 'rogersop', body: `this article doesn't even exist`}).expect(404).then(({body})=>{
+      expect(body.msg).toBe(`10101 is an invalid Article ID.`);
+    });
+  });
+  test('Status 400: should respond with "Invalid Input" when given an invalid format within the request body');
   test.todo('Status 400: responds with "Bad Request" when the request is not in the correct format');
  
 });
