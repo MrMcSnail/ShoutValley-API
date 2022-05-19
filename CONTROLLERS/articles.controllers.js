@@ -1,16 +1,16 @@
-/* eslint-disable prefer-promise-reject-errors */
-const {fetchArticleById, updateVotesByArticleID, fetchAllArticles, articleIDExists} = require('../MODELS/articles.models');
+const {fetchArticleById, updateVotesByArticleID, fetchAllArticles} = require('../MODELS/articles.models');
+const {articleIDExists} = require('../MODELS/utils.models');
 
 exports.getAllArticles = (req, res, next) => {
-  return fetchAllArticles()
+  const {sort_by, order} = req.query;
+  return fetchAllArticles(sort_by, order)
       .then((articles)=>{
         return res.status(200).send({articles});
-      });
+      }).catch(next);
 };
 
 exports.getArticleByID = (req, res, next) => {
   const {article_id} = req.params;
-
   return articleIDExists(article_id)
       .then((articleExists)=>{
         if (articleExists) {

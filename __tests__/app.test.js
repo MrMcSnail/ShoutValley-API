@@ -60,6 +60,32 @@ describe('GET /api/articles', ()=> {
           expect(articles).toBeSortedBy('created_at', {descending: true});
         });
   });
+  test('Status 200: articles?sort_by=:column should sort the articles by any valid column', () => {
+    return request(app)
+        .get('/api/articles?sort_by=article_id')
+        .expect(200)
+        .then(({body}) => {
+          const articles = body.articles;
+          expect(articles).toBeSortedBy('article_id', {descending: true});
+        });
+  });
+  test('/articles?sort_by=:column&:order should sort the articles by any valid column in ascending or descending order based on the query passed ("asc" || "desc")', () => {
+    return request(app)
+        .get('/api/articles?sort_by=votes&order=asc')
+        .expect(200)
+        .then(({body}) => {
+          const articles = body.articles;
+          expect(articles).toBeSortedBy('votes', {descending: false});
+        });
+  });
+  test(`Status 404: should return the message 'Invalid Sort Parameter' if an invalid column name is used`, () => {
+    return request(app)
+        .get('/api/articles?sort_by=handbag&order=asc')
+        .expect(404)
+        .then(({body}) => {
+          expect(body.msg).toBe(`Invalid Sort Parameter`);
+        });
+  });
 });
 
 describe('GET /api/articles/:article_id', () => {
