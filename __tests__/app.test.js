@@ -205,7 +205,14 @@ describe.only('POST /api/articles/:article_id/comments', () => {
       expect(body.msg).toBe(`10101 is an invalid Article ID.`);
     });
   });
-  test('Status 400: should respond with "Invalid Input" when given an invalid format within the request body');
+  test('Status 400: should respond with "Invalid Input" when given an invalid format within the request body', ()=>{
+    return request(app)
+        .post('/api/articles/1/comments')
+        .send({username: 'rogersop', handbag: 123})
+        .expect(400)
+        .then(({body})=>{
+          expect(body.msg).toBe(`Invalid Input`);
+        });
+  });
   test.todo('Status 400: responds with "Bad Request" when the request is not in the correct format');
- 
 });
