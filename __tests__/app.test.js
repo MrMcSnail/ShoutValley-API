@@ -185,3 +185,23 @@ describe('GET /api/articles/:article_id/comments', () => {
     });
   });
 });
+
+describe.only('POST /api/articles/:article_id/comments', () => {
+  test('Status 201: Request body accepts an object with the following properties: username, body and responds with: the posted comment', ()=>{
+    return request(app).post('/api/articles/3/comments').send({username: 'rogersop', body: 'your article looks really nice'}).expect(201).then(({body})=>{
+      const commentObj = {
+        comment_id: expect.any(Number),
+        body: 'your article looks really nice',
+        article_id: 3,
+        author: 'rogersop',
+        votes: expect.any(Number),
+        created_at: expect.any(String),
+      };
+      expect(body.comment).toEqual(expect.objectContaining(commentObj));
+    });
+  });
+  test.todo('Status 404: should respond with ""article_id" is an invalid Article ID." when an incorrect article id is passed');
+  test.todo('Status 400: should respond with "Invalid Input" when given an invalid format within the request body');
+  test.todo('Status 400: responds with "Bad Request" when the request is not in the correct format');
+ 
+});
