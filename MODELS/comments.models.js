@@ -12,7 +12,7 @@ exports.fetchCommentsByArticleID = (article_id) => {
         } else {
           return Promise.reject({
             status: 404,
-            msg: `${article_id} is an invalid Article ID.`,
+            msg: `Article with ID:${article_id} is not found.`,
           });
         }
       }).then(({rows})=>{
@@ -36,4 +36,24 @@ exports.deleteCommentByCommentID = (comment_id) => {
   DELETE FROM comments
   WHERE comment_id = $1;`,
   [comment_id]);
+
+exports.insertCommentAboutArticle = (article_id, username, body) => {
+  return articleIDExists(article_id)
+      .then((id_exists)=>{
+        if (id_exists) {
+          return db.query(`
+          INSERT INTO comments 
+          (body, article_id, author) 
+          VALUES ($1, $2, $3)
+          RETURNING *;`,
+          [body, article_id, username]).then(({rows})=>{
+            return rows[0];
+          });
+        } else {
+          return Promise.reject({
+            status: 404,
+            msg: `Article with ID:${article_id} is not found.`,
+          });
+        }
+      });
 };
