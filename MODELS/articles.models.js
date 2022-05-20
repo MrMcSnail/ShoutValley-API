@@ -1,49 +1,36 @@
 const db = require('../db/connection');
 const format = require('pg-format');
-const {columnValidate} = require('./utils.models');
 const {filterByTopicIfExists} =require('./topics.models');
 
 exports.fetchAllArticles = (sort_by='created_at', order ='DESC', topic) => {
-  // sanitise column name (sort_by)
-  return columnValidate(sort_by).then((columnExists) => {
-    if (columnExists) {
-      // sanitise SQL command (order)
-      const orderValidate = /(^desc$|^asc$)/gi;
-      if (orderValidate.test(order)) {
-        // construct query
-        const queryStart = format(
-            `SELECT articles.*,
+  const orderValidate = /(^desc$|^asc$)/gi;
+  if (orderValidate.test(order)) {
+    // construct query
+    const queryStart = format(
+        `SELECT articles.*,
         COUNT(comments.article_id) as "comment_count"
         FROM articles
         LEFT JOIN comments 
         ON comments.article_id = articles.article_id
         GROUP BY articles.article_id
         ORDER BY %I`, sort_by);
-        const queryString = queryStart.concat(' ', order, ' ', ';');
-        // make query
-        return db.query(queryString).then(({rows}) => {
-          // return the query
-          if (topic) {
-            return filterByTopicIfExists(topic, rows);
-          } else {
-            return rows;
-          }
-        });
+    const queryString = queryStart.concat(' ', order, ' ', ';');
+    // make query
+    return db.query(queryString).then(({rows}) => {
+      // return the query
+      if (topic) {
+        return filterByTopicIfExists(topic, rows);
       } else {
-        // error on 'order' query
-        return Promise.reject({
-          status: 400,
-          msg: `Order must be 'ASC' or 'DESC'.`,
-        });
+        return rows;
       }
-    } else {
-      // error on column (sort_by) query
-      return Promise.reject({
-        status: 404,
-        msg: `Invalid Sort Parameter`,
-      });
-    }
-  });
+    });
+  } else {
+    // error on 'order' query
+    return Promise.reject({
+      status: 400,
+      msg: `Order must be 'ASC' or 'DESC'.`,
+    });
+  };
 };
 
 exports.fetchArticleById = (article_id) => {

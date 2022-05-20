@@ -81,10 +81,10 @@ describe('GET /api/articles?sort_by=:column&order=asc||desc', () => {
           expect(articles).toBeSortedBy('votes', {descending: false});
         });
   });
-  test(`Status 404: should return the message 'Invalid Sort Parameter' if an invalid column name is used`, () => {
+  test(`Status 400: should return the message 'Invalid Sort Parameter' if an invalid column name is used`, () => {
     return request(app)
         .get('/api/articles?sort_by=handbag&order=asc')
-        .expect(404)
+        .expect(400)
         .then(({body}) => {
           expect(body.msg).toBe(`Invalid Sort Parameter`);
         });
