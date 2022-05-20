@@ -1,5 +1,5 @@
 const db = require('../db/connection');
-const {articleIDExists} = require('./articles.models');
+const {articleIDExists} = require('./utils.models');
 
 exports.fetchCommentsByArticleID = (article_id) => {
   return articleIDExists(article_id)
