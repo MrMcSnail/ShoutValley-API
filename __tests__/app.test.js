@@ -3,6 +3,7 @@ require('jest-sorted');
 const seed = require('../db/seeds/seed');
 const testData = require('../db/data/test-data');
 const db = require('../db/connection');
+const {commentExists} = require('../MODELS/utils.models');
 const app = require('../app');
 
 afterAll(() => {
@@ -139,20 +140,6 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 });
 
-describe('GET /api/users', ()=>{
-  test(`Status 200: Responds with an array of objects, each object should have the following property:
-username`, () => {
-    return request(app).get('/api/users').expect(200).then(({body})=>{
-      expect(body.users).toBeInstanceOf(Array);
-      if (body.users.length !== 0) {
-        body.users.forEach((user)=>{
-          expect(user).toHaveProperty('username');
-        });
-      }
-    });
-  });
-});
-
 describe('GET /api/articles/:article_id/comments', () => {
   test(`Status 200: Responds with an array of comments for the given "article_id" of which each comment should have the correct properties`, () => {
     const comment = {
@@ -182,6 +169,30 @@ describe('GET /api/articles/:article_id/comments', () => {
   test('Status 400: should respond with "Invalid Input" when given an article_id in an invalid format', ()=>{
     return request(app).get('/api/articles/nasty/comments').expect(400).then(({body})=>{
       expect(body.msg).toBe('Invalid Input');
+    });
+  });
+});
+
+describe('GET /api/users', ()=>{
+  test(`Status 200: Responds with an array of objects, each object should have the following property:
+username`, () => {
+    return request(app).get('/api/users').expect(200).then(({body})=>{
+      expect(body.users).toBeInstanceOf(Array);
+      if (body.users.length !== 0) {
+        body.users.forEach((user)=>{
+          expect(user).toHaveProperty('username');
+        });
+      }
+    });
+  });
+});
+
+describe('DELETE /api/comments/:comment_id', () => {
+  test(`Status 204: should delete the given comment by 'comment_id' and respond with no content`, ()=>{
+    return request(app).delete('/api/comments/3').expect(204).then((response)=>{
+      return commentExists(3).then((exists)=>{
+        expect(exists).toBe(false);
+      });
     });
   });
 });
