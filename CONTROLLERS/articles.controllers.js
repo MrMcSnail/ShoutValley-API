@@ -2,8 +2,8 @@ const {fetchArticleById, updateVotesByArticleID, fetchAllArticles} = require('..
 const {articleIDExists} = require('../MODELS/utils.models');
 
 exports.getAllArticles = (req, res, next) => {
-  const {sort_by, order} = req.query;
-  return fetchAllArticles(sort_by, order)
+  const {sort_by, order, topic} = req.query;
+  return fetchAllArticles(sort_by, order, topic)
       .then((articles)=>{
         return res.status(200).send({articles});
       }).catch(next);

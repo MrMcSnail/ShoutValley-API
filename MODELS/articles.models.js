@@ -1,8 +1,9 @@
 const db = require('../db/connection');
 const format = require('pg-format');
 const {columnValidate} = require('./utils.models');
+const {filterByTopicIfExists} =require('./topics.models');
 
-exports.fetchAllArticles = (sort_by = 'created_at', order = 'DESC') => {
+exports.fetchAllArticles = (sort_by='created_at', order ='DESC', topic) => {
   // sanitise column name (sort_by)
   return columnValidate(sort_by).then((columnExists) => {
     if (columnExists) {
@@ -17,13 +18,16 @@ exports.fetchAllArticles = (sort_by = 'created_at', order = 'DESC') => {
         LEFT JOIN comments 
         ON comments.article_id = articles.article_id
         GROUP BY articles.article_id
-        ORDER BY %I`,
-            sort_by,
-        );
+        ORDER BY %I`, sort_by);
         const queryString = queryStart.concat(' ', order, ' ', ';');
         // make query
         return db.query(queryString).then(({rows}) => {
-          return rows;
+          // return the query
+          if (topic) {
+            return filterByTopicIfExists(topic, rows);
+          } else {
+            return rows;
+          }
         });
       } else {
         // error on 'order' query

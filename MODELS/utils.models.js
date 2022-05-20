@@ -14,3 +14,9 @@ exports.articleIDExists = (article_id) => {
     return rows.length? true : false;
   });
 };
+
+exports.topicExists = (topic) => {
+  return db.query(`SELECT * FROM topics WHERE slug = $1`, [topic]).then(({rows})=>{
+    return rows.length? true : false;
+  });
+};
