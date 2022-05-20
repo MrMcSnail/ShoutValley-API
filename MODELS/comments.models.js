@@ -36,6 +36,7 @@ exports.deleteCommentByCommentID = (comment_id) => {
   DELETE FROM comments
   WHERE comment_id = $1;`,
   [comment_id]);
+};
 
 exports.insertCommentAboutArticle = (article_id, username, body) => {
   return articleIDExists(article_id)

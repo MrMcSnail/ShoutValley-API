@@ -290,8 +290,9 @@ describe('DELETE /api/comments/:comment_id', () => {
   test(`Status 400: Should respond with Bad Request if given an invalid comment id format`, ()=>{
     return request(app).delete('/api/comments/onyourhandbag@@').expect(400).then(({body})=>{
       expect(body.msg).toBe('Invalid Input');
-    })
-  })
+    });
+  });
+});
 
 describe('POST /api/articles/:article_id/comments', () => {
   test('Status 201: Request body accepts an object with the following properties: username, body and responds with: the posted comment', ()=>{
@@ -333,7 +334,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         .then(({body})=>{
           expect(body.msg).toBe(`Invalid Input`);
         });
-  })
+  });
   test('Status 400: should respond with "Invalid Input" when given an invalid format within the request body', ()=>{
     return request(app)
         .post('/api/articles/1/comments')
