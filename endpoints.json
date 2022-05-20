@@ -6,12 +6,17 @@
     "description": "serves an array of all topics",
     "queries": [],
     "exampleResponse": {
-      "topics": [{ "slug": "football", "description": "Footie!" }]
+      "topics": [
+        {
+          "slug": "football",
+          "description": "Footie!"
+        }
+      ]
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all topics",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves an array of articles. By default they are sorted by date in descending order.",
+    "queries": ["topic", "sort_by", "order"],
     "exampleResponse": {
       "articles": [
         {
@@ -19,9 +24,100 @@
           "topic": "cooking",
           "author": "weegembump",
           "body": "Text from the article..",
-          "created_at": 1527695953341
+          "created_at": "2020-06-20T07: 24: 00.000Z",
+          "votes": 0,
+          "comment_count": "12"
         }
       ]
     }
+  },
+  "GET /api/articles/:article_id": {
+    "description": "serves an array containing an article matching the specified article_id.",
+    "parameters": ["article_id"],
+    "exampleResponse": {
+      "articles": [
+        {
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2020-06-20T07: 24: 00.000Z",
+          "votes": 0,
+          "comment_count": "12"
+        }
+      ]
+    }
+  },
+  "PATCH /api/articles/:article_id": {
+    "description": "Updates the vote count of the specified article - Responds with: the updated article.",
+    "parameters": ["article_id"],
+    "exampleRequestBody": {
+      "inc_votes": 100
+    },
+    "exampleResponse": {
+      "articles": [
+        {
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2020-06-20T07: 24: 00.000Z",
+          "votes": 100,
+          "comment_count": "12"
+        }
+      ]
+    }
+  },
+  "GET /api/articles/:article_id/comments": {
+    "description": "serves an array containing all the comments matching the specified article_id.",
+    "parameters": ["article_id"],
+    "exampleResponse": {
+      "comments": [
+        {
+          "comment_id": 10,
+          "body": "git push origin master",
+          "article_id": 3,
+          "author": "icellusedkars",
+          "votes": 0,
+          "created_at": "2020-06-20T07: 24: 00.000Z"
+        }
+      ]
+    }
+  },
+  "GET /api/users": {
+    "description": "serves an array containing all the users",
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        }
+      ]
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "deletes a comment matching the given comment_id - responds with no content",
+    "parameters": ["comment_id"]
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "posts a new comment and responds with the posted content",
+    "exampleRequestBody": {
+      "username": "handbag",
+      "body": "This is something a handbag would say."
+    },
+    "exampleResponse": {
+        "comments": [
+          {
+            "comment_id": 321,
+            "body": "This is something a handbag would say.",
+            "article_id": 3,
+            "author": "handbag",
+            "votes": 0,
+            "created_at": "2020-06-20T07: 24: 00.000Z"
+          }
+        ]
+    }
   }
 }
+

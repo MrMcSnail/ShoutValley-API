@@ -25,6 +25,7 @@ describe('GET /not-a-route', () => {
 describe('GET /api', ()=> {
   test('Status 200: Responds with a JSON describing all the available endpoints on your API,', () => {
     return request(app).get('/api').expect(200).then(({body})=> {
+      expect(body.endpointMap).toHaveProperty('GET /api');
     });
   });
 });
@@ -272,8 +273,7 @@ describe('GET /api/articles/:article_id/comments', () => {
 });
 
 describe('GET /api/users', ()=>{
-  test(`Status 200: Responds with an array of objects, each object should have the following property:
-username`, () => {
+  test(`Status 200: Responds with an array of objects, each object should have the following property: username`, () => {
     return request(app).get('/api/users').expect(200).then(({body})=>{
       expect(body.users).toBeInstanceOf(Array);
       if (body.users.length !== 0) {
