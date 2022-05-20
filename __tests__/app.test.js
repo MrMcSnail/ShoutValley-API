@@ -281,15 +281,21 @@ username`, () => {
 
 describe('DELETE /api/comments/:comment_id', () => {
   test(`Status 204: should delete the given comment by 'comment_id' and respond with no content`, ()=>{
-    return request(app).delete('/api/comments/3').expect(204).then((response)=>{
-      return commentExists(3).then((exists)=>{
-        expect(exists).toBe(false);
-      });
-    });
+    return request(app).delete('/api/comments/3').expect(204)
+        .then((response)=>{
+          return commentExists(3).then((exists)=>{
+            expect(exists).toBe(false);
+          });
+        });
   });
   test(`Status 400: Should respond with Bad Request if given an invalid comment id format`, ()=>{
     return request(app).delete('/api/comments/onyourhandbag@@').expect(400).then(({body})=>{
       expect(body.msg).toBe('Invalid Input');
+    });
+  });
+  test(`Status 404: Should respond with 'Comment with ID:xxxx is not found.' if given a comment id for a comment that doesn't exist`, ()=>{
+    return request(app).delete('/api/comments/9999').expect(404).then(({body})=>{
+      expect(body.msg).toBe('Comment with ID:9999 is not found.');
     });
   });
 });
