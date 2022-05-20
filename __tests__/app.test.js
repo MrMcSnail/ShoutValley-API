@@ -3,6 +3,7 @@ require('jest-sorted');
 const seed = require('../db/seeds/seed');
 const testData = require('../db/data/test-data');
 const db = require('../db/connection');
+const {commentExists} = require('../MODELS/utils.models');
 const app = require('../app');
 
 afterAll(() => {
@@ -231,20 +232,6 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 });
 
-describe('GET /api/users', ()=>{
-  test(`Status 200: Responds with an array of objects, each object should have the following property:
-username`, () => {
-    return request(app).get('/api/users').expect(200).then(({body})=>{
-      expect(body.users).toBeInstanceOf(Array);
-      if (body.users.length !== 0) {
-        body.users.forEach((user)=>{
-          expect(user).toHaveProperty('username');
-        });
-      }
-    });
-  });
-});
-
 describe('GET /api/articles/:article_id/comments', () => {
   test(`Status 200: Responds with an array of comments for the given "article_id" of which each comment should have the correct properties`, () => {
     const comment = {
@@ -278,6 +265,41 @@ describe('GET /api/articles/:article_id/comments', () => {
   });
 });
 
+describe('GET /api/users', ()=>{
+  test(`Status 200: Responds with an array of objects, each object should have the following property:
+username`, () => {
+    return request(app).get('/api/users').expect(200).then(({body})=>{
+      expect(body.users).toBeInstanceOf(Array);
+      if (body.users.length !== 0) {
+        body.users.forEach((user)=>{
+          expect(user).toHaveProperty('username');
+        });
+      }
+    });
+  });
+});
+
+describe('DELETE /api/comments/:comment_id', () => {
+  test(`Status 204: should delete the given comment by 'comment_id' and respond with no content`, ()=>{
+    return request(app).delete('/api/comments/3').expect(204)
+        .then((response)=>{
+          return commentExists(3).then((exists)=>{
+            expect(exists).toBe(false);
+          });
+        });
+  });
+  test(`Status 400: Should respond with Bad Request if given an invalid comment id format`, ()=>{
+    return request(app).delete('/api/comments/onyourhandbag@@').expect(400).then(({body})=>{
+      expect(body.msg).toBe('Invalid Input');
+    });
+  });
+  test(`Status 404: Should respond with 'Comment with ID:xxxx is not found.' if given a comment id for a comment that doesn't exist`, ()=>{
+    return request(app).delete('/api/comments/9999').expect(404).then(({body})=>{
+      expect(body.msg).toBe('Comment with ID:9999 is not found.');
+    });
+  });
+});
+
 describe('POST /api/articles/:article_id/comments', () => {
   test('Status 201: Request body accepts an object with the following properties: username, body and responds with: the posted comment', ()=>{
     return request(app).post('/api/articles/3/comments').send({username: 'rogersop', body: 'your article looks really nice'}).expect(201).then(({body})=>{
@@ -301,6 +323,15 @@ describe('POST /api/articles/:article_id/comments', () => {
           expect(body.msg).toBe(`Article with ID:10101 is not found.`);
         });
   });
+  test('Status 404: responds with "Username Does Not Exist" when the request includes a username not in the database', ()=>{
+    return request(app)
+        .post('/api/articles/1/comments')
+        .send({username: 'handbag', body: `you're dead to me`})
+        .expect(404)
+        .then(({body})=>{
+          expect(body.msg).toBe(`Username Does Not Exist`);
+        });
+  });
   test('Status 400: should respond with Invalid Input when article_id is of the wrong type', ()=>{
     return request(app)
         .post('/api/articles/handbag/comments')
@@ -309,7 +340,7 @@ describe('POST /api/articles/:article_id/comments', () => {
         .then(({body})=>{
           expect(body.msg).toBe(`Invalid Input`);
         });
-  })
+  });
   test('Status 400: should respond with "Invalid Input" when given an invalid format within the request body', ()=>{
     return request(app)
         .post('/api/articles/1/comments')
@@ -317,15 +348,6 @@ describe('POST /api/articles/:article_id/comments', () => {
         .expect(400)
         .then(({body})=>{
           expect(body.msg).toBe(`Invalid Input`);
-        });
-  });
-  test('Status 404: responds with "Username Does Not Exist" when the request includes a username not in the database', ()=>{
-    return request(app)
-        .post('/api/articles/1/comments')
-        .send({username: 'handbag', body: `you're dead to me`})
-        .expect(404)
-        .then(({body})=>{
-          expect(body.msg).toBe(`Username Does Not Exist`);
         });
   });
 });
