@@ -195,4 +195,9 @@ describe('DELETE /api/comments/:comment_id', () => {
       });
     });
   });
+  test(`Status 400: Should respond with Bad Request if given an invalid comment id format`, ()=>{
+    return request(app).delete('/api/comments/onyourhandbag@@').expect(400).then(({body})=>{
+      expect(body.msg).toBe('Invalid Input');
+    })
+  })
 });
