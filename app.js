@@ -6,10 +6,14 @@ const {getArticleByID, patchVotesByArticleID, getAllArticles} = require('./CONTR
 const {getAllUsers} = require('./CONTROLLERS/users.controllers');
 const {handleCustomErrors, handlePsqlErrors, handleServerErrors,
 } = require('./CONTROLLERS/errors.controllers');
+const endpointMap = require('./endpoints.json');
 app.use(express.json());
 
-app.get('/api/topics', getTopics);
+app.get('/api', (req, res, next)=> {
+  res.status(200).send({endpointMap});
+});
 
+app.get('/api/topics', getTopics);
 app.get('/api/articles', getAllArticles);
 app.get('/api/articles/:article_id', getArticleByID);
 app.get('/api/articles/:article_id/comments', getCommentsByArticleID);

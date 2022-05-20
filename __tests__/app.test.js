@@ -22,6 +22,12 @@ describe('GET /not-a-route', () => {
   });
 });
 
+describe('GET /api', ()=> {
+  test('Status 200: Responds with a JSON describing all the available endpoints on your API,', () => {
+    return request(app).get('/api').expect(200).then(({body})=> {
+    });
+  });
+});
 describe('GET /api/topics', () => {
   test(`should respond with an array of topic objects, each of which should have the following properties: 'slug', 'description'`, () => {
     return request(app).get('/api/topics').expect(200).then(({body}) => {
