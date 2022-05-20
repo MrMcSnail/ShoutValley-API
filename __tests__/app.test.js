@@ -63,6 +63,98 @@ describe('GET /api/articles', ()=> {
   });
 });
 
+describe('GET /api/articles?sort_by=:column&order=asc||desc', () => {
+  test('Status 200: articles?sort_by=:column should sort the articles by any valid column', () => {
+    return request(app)
+        .get('/api/articles?sort_by=article_id')
+        .expect(200)
+        .then(({body}) => {
+          const articles = body.articles;
+          expect(articles).toBeSortedBy('article_id', {descending: true});
+        });
+  });
+  test('Status 200: /articles?sort_by=:column&:order should sort the articles by any valid column in ascending or descending order based on the query passed ("asc" || "desc")', () => {
+    return request(app)
+        .get('/api/articles?sort_by=votes&order=asc')
+        .expect(200)
+        .then(({body}) => {
+          const articles = body.articles;
+          expect(articles).toBeSortedBy('votes', {descending: false});
+        });
+  });
+  test(`Status 400: should return the message 'Invalid Sort Parameter' if an invalid column name is used`, () => {
+    return request(app)
+        .get('/api/articles?sort_by=handbag&order=asc')
+        .expect(400)
+        .then(({body}) => {
+          expect(body.msg).toBe(`Invalid Sort Parameter`);
+        });
+  });
+});
+
+describe('GET /api/articles?topic=:topic_name', () => {
+  test('Status 200: Should respond with an array of article objects filtered by topic.', () => {
+    return request(app).get('/api/articles?topic=mitch').expect(200).then(({body})=>{
+      const articles = body.articles;
+      expect(articles).toBeInstanceOf(Array);
+      if (articles.length) {
+        articles.forEach((article)=>{
+          expect(article).toHaveProperty('topic', 'mitch');
+        });
+      }
+    });
+  });
+
+  test('Status 200: Responds with an empty array when `topic` exists but does not have any articles associated with it', ()=>{
+    return request(app).get('/api/articles?topic=paper').expect(200).then(({body})=>{
+      const articles = body.articles;
+      expect(articles).toHaveLength(0);
+    });
+  });
+
+  test(`Integrates with existing query parameters: 
+  Status 200: Should return a list of articles filtered by topic sorted by column name and in a specified order`, ()=>{
+    return request(app).get('/api/articles?topic=mitch&sort_by=article_id&order=asc').expect(200).then(({body})=>{
+      const articles = body.articles;
+      expect(articles).toBeInstanceOf(Array);
+      if (articles.length) {
+        articles.forEach((article)=>{
+          expect(article).toHaveProperty('topic', 'mitch');
+        });
+      }
+      expect(articles).toBeSortedBy('article_id', {descending: false});
+    });
+  });
+
+  test('Status 404: Topic not found in the database', ()=>{
+    return request(app).get('/api/articles?topic=handbag').expect(404).then(({body})=>{
+      expect(body.msg).toBe('Topic not found');
+    });
+  });
+
+  test('Reverts to default artilce fetch when invalid queries are used', () => {
+    return request(app).get('/api/articles?orderlunch=maybe&sortout=yourlife&topics=ofconverstaion').expect(200).then(({body}) => {
+      const articles = body.articles;
+      const exampleArticle = {
+        article_id: expect.any(Number),
+        title: expect.any(String),
+        topic: expect.any(String),
+        author: expect.any(String),
+        body: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        comment_count: expect.any(String),
+      };
+      if (articles.length) {
+        articles.forEach((article)=>{
+          expect(article).toEqual(expect.objectContaining(exampleArticle));
+        });
+      }
+      expect(articles).toBeSortedBy('created_at', {descending: true});
+    });
+  });
+});
+
 describe('GET /api/articles/:article_id', () => {
   test('Status 200: Responds with an article from the DB based on the id parameter in the request', () => {
     return request(app).get('/api/articles/8').expect(200).then(({body})=>{

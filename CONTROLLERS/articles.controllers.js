@@ -1,28 +1,29 @@
-/* eslint-disable prefer-promise-reject-errors */
 const {fetchArticleById, updateVotesByArticleID, fetchAllArticles} = require('../MODELS/articles.models');
-const {fetchCommentCountByArticleID} = require('../MODELS/comments.models');
+const {articleIDExists} = require('../MODELS/utils.models');
 
 exports.getAllArticles = (req, res, next) => {
-  return fetchAllArticles()
+  const {sort_by, order, topic} = req.query;
+  return fetchAllArticles(sort_by, order, topic)
       .then((articles)=>{
         return res.status(200).send({articles});
-      });
+      }).catch(next);
 };
 
 exports.getArticleByID = (req, res, next) => {
   const {article_id} = req.params;
-
-  const promises = [
-    fetchArticleById(article_id),
-    fetchCommentCountByArticleID(article_id),
-  ];
-
-  return Promise.all(promises)
-      .then(([article, comments])=>{
-        article.comment_count = comments.count;
-        return res.status(200).send({article});
-      })
-      .catch(next);
+  return articleIDExists(article_id)
+      .then((articleExists)=>{
+        if (articleExists) {
+          return fetchArticleById(article_id);
+        } else {
+          return Promise.reject({
+            status: 404,
+            msg: `Article with ID:${article_id} is not found.`,
+          });
+        }
+      }).then((article)=>{
+        res.status(200).send({article});
+      }).catch(next);
 };
 
 exports.patchVotesByArticleID = (req, res, next) => {
