@@ -36,15 +36,13 @@ exports.fetchAllArticles = (sort_by='created_at', order ='DESC', topic) => {
 exports.fetchArticleById = (article_id) => {
   return db
       .query(
-          `
-  SELECT 
-  articles.*,
-  COUNT(comments.article_id) as "comment_count"
-  FROM articles
-  LEFT JOIN comments 
-  ON comments.article_id = articles.article_id
-  WHERE articles.article_id = $1
-  GROUP BY articles.article_id;`,
+          `SELECT articles.*,
+          COUNT(comments.article_id) as "comment_count"
+          FROM articles
+          LEFT JOIN comments 
+          ON comments.article_id = articles.article_id
+          WHERE articles.article_id = $1
+          GROUP BY articles.article_id;`,
           [article_id],
       )
       .then(({rows}) => {

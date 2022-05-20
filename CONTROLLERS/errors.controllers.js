@@ -10,6 +10,12 @@ exports.handlePsqlErrors = (err, req, res, next) => {
   }
   if (err.code === '42703') {
     res.status(400).send({msg: 'Invalid Sort Parameter'});
+  }
+  if (err.code === '23502') {
+    res.status(400).send({msg: 'Invalid Input'});
+  }
+  if (err.detail.includes('is not present in table "users"')) {
+    res.status(404).send({msg: 'Username Does Not Exist'});
   } else next(err);
 };
 
